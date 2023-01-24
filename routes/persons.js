@@ -6,7 +6,7 @@ let personsData = [
   id: 1,
   name: 'Emily',
   address: '2 Willow Lane'
-},
+  },
   {
     id: 2,
     name: 'Haley',
@@ -21,20 +21,31 @@ router.get('/', function(req, res, next) {
 
 // GET by id
 router.get('/id/:personId', function(req, res, next) {
-  console.log(req.params.personId)
-  res.send({ persons: personsData.filter(person => person.id === parseInt(req.params.personId)) })
+  res.send({ persons: personsData
+    .filter(person => person.id === parseInt(req.params.personId))
+  })
 });
 
 // POST
 router.post('/', function(req, res, next) {
-  personsData.push(req.body)
-  res.send({ persons: personsData })
+  // req.body = { name: 'Caye', address: 'Pelican Town' }
+  const id = personsData.length + 1
+  console.log(req.body)
+  const newPerson = { id, ...req.body }
+  personsData.push(newPerson)
+  res.send(newPerson)
 });
 
 // PATCH
-router.patch('/', function(req, res, next) {
-  let person = personsData.
-  res.send({ persons: personsData })
+router.patch('/id/:personId', function(req, res, next) {
+  const personIndex = personsData
+    .findIndex(person => person.id === parseInt(req.params.personId))
+  const updatedPerson = {
+    ...personsData[personIndex],
+    ...req.body
+  }
+  personsData[personIndex] = updatedPerson // updates whole list (personsData)
+  res.send(updatedPerson)
 })
 
 module.exports = router;
