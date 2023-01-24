@@ -48,4 +48,13 @@ router.patch('/id/:personId', function(req, res, next) {
   res.send(updatedPerson)
 })
 
+// DELETE
+router.delete('/id/:personId', function(req, res, next) {
+  const personIndex = personsData
+    .findIndex(person => person.id === parseInt(req.params.personId))
+  personsData.splice(personIndex, 1)
+  // delete personsData[personIndex]
+  res.send(personsData)
+})
+
 module.exports = router;
