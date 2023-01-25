@@ -1,4 +1,5 @@
 const persons = require('../models/persons')
+const schema = require('../schema/persons')
 
 exports.getAllPersons = (req, res, next) => {
   res.send({ persons: persons.data })
@@ -11,6 +12,10 @@ exports.getPersonById = (req, res, next) => {
 }
 
 exports.addPerson = (req, res, next) => {
+  const { error } = schema.newPerson.validate(req.body)
+  if (!!error) {
+    return res.status(400).json(error)
+  }
   const id = persons.data.length + 1
   const newPerson = { id, ...req.body }
   persons.data.push(newPerson)
@@ -18,6 +23,10 @@ exports.addPerson = (req, res, next) => {
 }
 
 exports.updatePerson = (req, res, next) => {
+  const { error } = schema.updatePerson.validate(req.body)
+  if (!!error) {
+    return res.status(400).json(error)
+  }
   const personIndex = persons.data
     .findIndex(person => person.id === parseInt(req.params.personId))
   const updatedPerson = {
