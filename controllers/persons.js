@@ -1,11 +1,12 @@
-const persons = require('../models/persons')
+const models = require('../models')
 const schema = require('../schema/persons')
 
-exports.getAllPersons = (req, res, next) => {
-  res.send({ persons: persons.data })
+const getAllPersons = async (req, res, next) => {
+  const persons = await models.Person.findAll()
+  res.send({ persons: persons })
 }
 
-exports.getPersonById = (req, res, next) => {
+const getPersonById = (req, res, next) => {
   const filterPerson = persons.data
     .filter(person => person.id === parseInt(req.params.personId))
   if (filterPerson.length > 0) {
@@ -14,7 +15,7 @@ exports.getPersonById = (req, res, next) => {
   res.status(400).send({ error: `User ${req.params.personId} not found` })
 }
 
-exports.addPerson = (req, res, next) => {
+const addPerson = (req, res, next) => {
   const { error } = schema.newPerson.validate(req.body)
   if (!!error) {
     return res.status(400).json(error)
@@ -25,7 +26,7 @@ exports.addPerson = (req, res, next) => {
   res.send({ persons: [newPerson] })
 }
 
-exports.updatePerson = (req, res, next) => {
+const updatePerson = (req, res, next) => {
   const personIndex = persons.data
     .findIndex(person => person.id === parseInt(req.params.personId))
     console.log(personIndex)
@@ -47,7 +48,7 @@ exports.updatePerson = (req, res, next) => {
   res.send({ persons: [updatedPerson] })
 }
 
-exports.deletePerson = (req, res, next) => {
+const deletePerson = (req, res, next) => {
   // Make sure user exists to be able to delete them
   const personIndex = persons.data
     .findIndex(person => person.id === parseInt(req.params.personId))
@@ -56,4 +57,12 @@ exports.deletePerson = (req, res, next) => {
   }
   persons.data.splice(personIndex, 1)
   res.send({ persons: persons.data })
+}
+
+module.exports = {
+  getAllPersons,
+  getPersonById,
+  addPerson,
+  updatePerson,
+  deletePerson
 }

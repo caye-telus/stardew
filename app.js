@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var models = require('./models')
+var db = require('./utils/database')
 
 var indexRouter = require('./routes/index');
 var personsRouter = require('./routes/persons');
@@ -38,6 +40,32 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+db.authenticate().then(() => {
+  console.log('✅ Connection has been established successfully.');
+}).catch((error) => {
+  console.error('❌ Unable to connect to the database: ', error);
+});
+
+const eraseDatabaseOnSync = true;
+
+// Sync database — force: true means, it will drop table if it exists
+db.sync({ force: eraseDatabaseOnSync }).then(async () => {
+  if (eraseDatabaseOnSync) {
+    // Seed data
+    await models.Person.bulkCreate(
+      [
+        { name: 'Emily', address: '2 Willow Lane' },
+        { name: 'Haley', address: '2 Willow Lane' },
+        { name: 'Lewis', address: 'Mayor\'s Manor' }
+      ]
+    );
+    console.log('✨ Persons table created successfully!');
+  }
+  console.log('✨ Sync successful!');
+}).catch((error) => {
+  console.error('Unable to sync : ', error);
 });
 
 module.exports = app;
